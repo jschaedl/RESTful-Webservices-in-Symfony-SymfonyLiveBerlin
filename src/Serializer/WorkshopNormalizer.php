@@ -6,6 +6,7 @@ namespace App\Serializer;
 
 use App\Entity\Workshop;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -14,7 +15,8 @@ final class WorkshopNormalizer implements NormalizerInterface
     public function __construct(
         // see: https://github.com/symfony/maker-bundle/issues/1252
         #[Autowire(service: 'serializer.normalizer.object')]
-        private readonly NormalizerInterface $normalizer
+        private readonly NormalizerInterface $normalizer,
+        private UrlGeneratorInterface $urlGenerator,
     ) {
     }
 
@@ -37,7 +39,17 @@ final class WorkshopNormalizer implements NormalizerInterface
 
         $context = array_merge($context, $customContext);
 
-        return $this->normalizer->normalize($object, $format, $context);
+        $data = $this->normalizer->normalize($object, $format, $context);
+
+        if (\is_array($data)) {
+            $data['_links']['self']['href'] = $this->urlGenerator->generate('read_attendee', [
+                'identifier' => $object->getIdentifier(),
+            ]);
+
+            $data['_links']['collection']['href'] = $this->urlGenerator->generate('list_attendee');
+        }
+
+        return $data;
     }
 
     // see: https://github.com/symfony/symfony-docs/issues/18042
