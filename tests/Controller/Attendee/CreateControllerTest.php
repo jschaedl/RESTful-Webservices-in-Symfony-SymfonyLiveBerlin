@@ -47,16 +47,16 @@ EOT
         $this->browser->request('POST', '/attendees', [], [], [], $requestBody);
 
         static::assertResponseStatusCodeSame(422);
-        static::assertStringContainsString(
-            'UnprocessableEntityHttpException',
-            $this->browser->getResponse()->getContent()
-        );
+
+        $this->assertMatchesJsonSnapshot($this->browser->getResponse()->getContent());
     }
 
     public static function provideUnprocessableAttendeeData(): \Generator
     {
         yield 'no data' => [''];
         yield 'empty data' => ['{}'];
+        yield 'wrong json one' => ['{'];
+        yield 'wrong json two' => ['}'];
         yield 'missing firstname' => ['{"lastname": "Paulsen", "email": "paul@paulsen.de"}'];
         yield 'missing lastname' => ['{"firstname": "Paul", "email": "paul@paulsen.de"}'];
         yield 'missing email' => ['{"firstname": "Paul", "lastname": "Paulsen"}'];
