@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Serializer;
 
 use App\Entity\Attendee;
+use App\Negotiation\RequestFormat;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -41,13 +42,19 @@ final class AttendeeNormalizer implements NormalizerInterface
 
         $data = $this->normalizer->normalize($object, $format, $context);
 
-        if (\is_array($data)) {
-            $data['_links']['self']['href'] = $this->urlGenerator->generate('read_workshop', [
-                'identifier' => $object->getIdentifier(),
-            ]);
-
-            $data['_links']['collection']['href'] = $this->urlGenerator->generate('list_workshop');
+        if (!\is_array($data)) {
+            return $data;
         }
+
+        if (RequestFormat::JSON_HAL !== $format) {
+            return $data;
+        }
+
+        $data['_links']['self']['href'] = $this->urlGenerator->generate('read_workshop', [
+            'identifier' => $object->getIdentifier(),
+        ]);
+
+        $data['_links']['collection']['href'] = $this->urlGenerator->generate('list_workshop');
 
         return $data;
     }

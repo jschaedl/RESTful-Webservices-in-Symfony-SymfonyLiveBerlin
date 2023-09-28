@@ -8,15 +8,27 @@ use App\Tests\ApiTestCase;
 
 class ListControllerTest extends ApiTestCase
 {
-    public function test_it_should_list_all_workshops(): void
+    public static function provideHttpAcceptHeaderValues(): \Generator
+    {
+        yield 'json' => ['application/json'];
+        yield 'hal+json' => ['application/hal+json'];
+    }
+
+    /**
+     * @dataProvider provideHttpAcceptHeaderValues
+     */
+    public function test_it_should_list_all_workshops(string $httpAcceptHeaderValue): void
     {
         $this->loadFixtures([
             __DIR__.'/fixtures/list_workshop.yaml',
         ]);
 
-        $this->browser->request('GET', '/workshops');
+        $this->browser->request('GET', '/workshops', [], [], [
+            'HTTP_ACCEPT' => $httpAcceptHeaderValue,
+        ]);
 
         static::assertResponseIsSuccessful();
+        static::assertStringContainsString($httpAcceptHeaderValue, $this->browser->getResponse()->headers->get('Content-Type'));
 
         $this->assertMatchesJsonSnapshot($this->browser->getResponse()->getContent());
     }

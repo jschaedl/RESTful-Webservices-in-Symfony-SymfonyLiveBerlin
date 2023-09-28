@@ -13,7 +13,7 @@ final class PaginatedCollection
     public readonly int $count;
 
     #[SerializedName('_links')]
-    public array $links;
+    public ?array $links;
 
     public function __construct(\Iterator $items, int $total)
     {

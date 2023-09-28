@@ -27,10 +27,8 @@ final class ListController
             $request->query->getInt('size', 10)
         );
 
-        $serializedWorkshopCollection = $this->serializer->serialize($workshopCollection, 'json');
+        $serializedWorkshopCollection = $this->serializer->serialize($workshopCollection, $request->getRequestFormat());
 
-        return new Response($serializedWorkshopCollection, Response::HTTP_OK, [
-            'Content-Type' => 'application/json',
-        ]);
+        return new Response($serializedWorkshopCollection, Response::HTTP_OK);
     }
 }

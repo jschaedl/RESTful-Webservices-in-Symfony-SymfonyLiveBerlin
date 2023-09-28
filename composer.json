@@ -23,7 +23,8 @@
         "symfony/runtime": "6.3.*",
         "symfony/serializer": "6.3.*",
         "symfony/yaml": "6.3.*",
-        "webmozart/assert": "^1.11"
+        "webmozart/assert": "^1.11",
+        "willdurand/negotiation": "^3.1"
     },
     "config": {
         "allow-plugins": {
