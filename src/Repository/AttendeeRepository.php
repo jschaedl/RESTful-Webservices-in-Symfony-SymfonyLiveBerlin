@@ -20,4 +20,10 @@ class AttendeeRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Attendee::class);
     }
+
+    public function save(Attendee $attendee): void
+    {
+        $this->getEntityManager()->persist($attendee);
+        $this->getEntityManager()->flush();
+    }
 }
