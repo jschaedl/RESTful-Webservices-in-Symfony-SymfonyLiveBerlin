@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Pagination;
 
+use App\Negotiation\ContentNegotiator;
+use App\Negotiation\RequestFormat;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -11,7 +13,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 abstract class PaginatedCollectionFactory
 {
     public function __construct(
-        private readonly UrlGeneratorInterface $urlGenerator
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly ContentNegotiator $contentNegotiator,
     ) {
     }
 
@@ -38,6 +41,10 @@ abstract class PaginatedCollectionFactory
         ;
 
         $paginatedCollection = new PaginatedCollection($paginator->getIterator(), $total);
+
+        if (!$this->contentNegotiator->isNegotiatedRequestFormat(RequestFormat::JSON_HAL)) {
+            return $paginatedCollection;
+        }
 
         $routeName = $this->getRouteName();
 
