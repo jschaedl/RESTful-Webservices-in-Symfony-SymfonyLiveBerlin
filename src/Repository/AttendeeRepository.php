@@ -26,4 +26,10 @@ class AttendeeRepository extends ServiceEntityRepository
         $this->getEntityManager()->persist($attendee);
         $this->getEntityManager()->flush();
     }
+
+    public function delete(Attendee $attendee): void
+    {
+        $this->getEntityManager()->remove($attendee);
+        $this->getEntityManager()->flush();
+    }
 }

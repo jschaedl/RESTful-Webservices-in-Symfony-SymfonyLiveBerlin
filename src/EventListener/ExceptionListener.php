@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
+use App\Domain\Exception\AttendeeAlreadyAttendsOtherWorkshopOnThatDateException;
+use App\Domain\Exception\AttendeeLimitReachedException;
 use App\Error\ApiError;
 use App\Error\ApiErrorCollection;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
@@ -25,25 +27,33 @@ class ExceptionListener
 
     public function onKernelException(ExceptionEvent $event): void
     {
-        $errorCollection = null;
-
         $throwable = $event->getThrowable();
 
-        if ($throwable instanceof NotEncodableValueException) {
-            $errorCollection = $this->handleNotEncodableValueException($throwable);
+        if (!($throwable instanceof NotEncodableValueException
+            || $throwable instanceof ValidationFailedException
+            || $throwable instanceof AttendeeAlreadyAttendsOtherWorkshopOnThatDateException
+            || $throwable instanceof AttendeeLimitReachedException)
+        ) {
+            return;
         }
+
+        if ($throwable instanceof NotEncodableValueException) {
+            $errorCollection = (new ApiErrorCollection())
+                ->addApiError(new ApiError('Encoding failed.', $throwable->getMessage()));
+        }
+
         if ($throwable instanceof ValidationFailedException) {
             $errorCollection = $this->handleValidationFailedException($throwable);
         }
 
-        if (null === $errorCollection) {
-            $errorCollection = new ApiErrorCollection();
-            $errorCollection->addApiError(
-                new ApiError(
-                    'Error.',
-                    $throwable->getMessage()
-                )
-            );
+        if ($throwable instanceof AttendeeAlreadyAttendsOtherWorkshopOnThatDateException) {
+            $errorCollection = (new ApiErrorCollection())
+                ->addApiError(new ApiError('Error', $throwable->getMessage()));
+        }
+
+        if ($throwable instanceof AttendeeLimitReachedException) {
+            $errorCollection = (new ApiErrorCollection())
+                ->addApiError(new ApiError('Error', $throwable->getMessage()));
         }
 
         $serializedErrors = $this->serializer->serialize($errorCollection, $event->getRequest()->getRequestFormat());
@@ -64,20 +74,6 @@ class ExceptionListener
                 )
             );
         }
-
-        return $errorCollection;
-    }
-
-    private function handleNotEncodableValueException(NotEncodableValueException $notEncodableValueException): ApiErrorCollection
-    {
-        $errorCollection = new ApiErrorCollection();
-
-        $errorCollection->addApiError(
-            new ApiError(
-                'Encoding failed.',
-                $notEncodableValueException->getMessage()
-            )
-        );
 
         return $errorCollection;
     }
