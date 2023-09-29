@@ -20,4 +20,16 @@ class WorkshopRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Workshop::class);
     }
+
+    public function save(Workshop $workshop): void
+    {
+        $this->getEntityManager()->persist($workshop);
+        $this->getEntityManager()->flush();
+    }
+
+    public function delete(Workshop $workshop): void
+    {
+        $this->getEntityManager()->remove($workshop);
+        $this->getEntityManager()->flush();
+    }
 }
