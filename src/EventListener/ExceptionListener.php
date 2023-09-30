@@ -11,6 +11,7 @@ use App\Error\ApiErrorCollection;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -30,10 +31,22 @@ class ExceptionListener
         $throwable = $event->getThrowable();
 
         if (!($throwable instanceof NotEncodableValueException
+            || $throwable instanceof AccessDeniedHttpException
             || $throwable instanceof ValidationFailedException
             || $throwable instanceof AttendeeAlreadyAttendsOtherWorkshopOnThatDateException
             || $throwable instanceof AttendeeLimitReachedException)
         ) {
+            return;
+        }
+
+        if ($throwable instanceof AccessDeniedHttpException) {
+            $errorCollection = (new ApiErrorCollection())
+                ->addApiError(new ApiError('Access Denied.', $throwable->getMessage()));
+
+            $serializedErrors = $this->serializer->serialize($errorCollection, $event->getRequest()->getRequestFormat());
+
+            $event->setResponse(new Response($serializedErrors, Response::HTTP_FORBIDDEN));
+
             return;
         }
 
