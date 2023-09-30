@@ -32,19 +32,34 @@ class Attendee
     private string $lastname;
 
     #[ORM\Column(type: 'string', length: 255)]
+    private string $name;
+
+    #[ORM\Column(type: 'string', length: 255)]
     private string $email;
 
     #[ORM\ManyToMany(targetEntity: Workshop::class, inversedBy: 'attendees')]
     private Collection $workshops;
 
-    public function __construct(string $identifier, string $firstname, string $lastname, string $email)
+    public function __construct(string $identifier, string $firstname, string $lastname, string $name, string $email)
     {
+        if ((!empty($firstname) || !empty($lastname)) && empty($name)) {
+            @trigger_error('Passing values for argument "$firstname" or "$lastname" is deprecated. Pass a value for argument "$name" instead.', E_USER_DEPRECATED);
+        }
+
         Assert::uuid($identifier, 'Argument $identifier is not a valid UUID: %s');
+
+        if ((empty($firstname) || empty($lastname)) && empty($name)) {
+            throw new \InvalidArgumentException('Passing values for argument "$firstname" and "$lastname" is deprecated. Pass a value for argument "$name" instead.');
+        }
+
         Assert::email($email);
 
         $this->identifier = Uuid::fromString($identifier);
         $this->firstname = $firstname;
         $this->lastname = $lastname;
+
+        $this->name = empty($name) ? $firstname.' '.$lastname : $name;
+
         $this->email = $email;
 
         $this->workshops = new ArrayCollection();
@@ -62,6 +77,8 @@ class Attendee
 
     public function getFirstname(): string
     {
+        @trigger_error('Calling Attendee::getFirstname() is deprecated. Use Attendee::getName()', E_USER_DEPRECATED);
+
         return $this->firstname;
     }
 
@@ -74,6 +91,8 @@ class Attendee
 
     public function getLastname(): string
     {
+        @trigger_error('Calling Attendee::getLastname() is deprecated. Use Attendee::getName()', E_USER_DEPRECATED);
+
         return $this->lastname;
     }
 
@@ -82,6 +101,11 @@ class Attendee
         $this->lastname = $lastname;
 
         return $this;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
     }
 
     public function getEmail(): string

@@ -15,7 +15,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_USER')]
 #[Route('/attendees/{identifier}', name: 'update_attendee', methods: ['PUT'])]
-#[OA\Put(tags: ['Attendee'])]
+#[OA\Put(
+    description: 'This endpoint is deprecated, please don\'t rely on it anymore.',
+    tags: ['Attendee'],
+    deprecated: true
+)]
 final class UpdateController
 {
     public function __construct(
@@ -27,6 +31,8 @@ final class UpdateController
     {
         $this->attendeeUpdater->update($attendee, $updateAttendeeModel);
 
-        return new Response(null, Response::HTTP_NO_CONTENT);
+        return new Response(null, Response::HTTP_NO_CONTENT, [
+            'Sunset' => (new \DateTime())->modify('+ 1 year')->format(DATE_RFC7231), // HTTP Date by RFC 7231
+        ]);
     }
 }
