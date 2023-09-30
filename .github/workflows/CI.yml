@@ -38,8 +38,5 @@ jobs:
       - name: "Install dependencies"
         run: make dev-init
 
-      - name: Generate KeyPair
-        run: php bin/console lexik:jwt:generate-keypair
-
       - name: "Run tests"
         run: make tests

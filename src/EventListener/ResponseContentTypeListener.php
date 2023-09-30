@@ -16,6 +16,10 @@ final class ResponseContentTypeListener
         $request = $event->getRequest();
         $response = $event->getResponse();
 
+        if ('app.swagger_ui' === $request->get('_route')) {
+            return;
+        }
+
         $response->headers->set(
             'Content-Type',
             sprintf('%s; charset=utf-8', $request->getMimeType($request->getRequestFormat()))

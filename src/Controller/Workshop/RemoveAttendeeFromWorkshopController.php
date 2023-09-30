@@ -7,6 +7,7 @@ namespace App\Controller\Workshop;
 use App\Entity\Attendee;
 use App\Entity\Workshop;
 use App\Repository\WorkshopRepository;
+use OpenApi\Attributes as OA;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,6 +16,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_USER')]
 #[Route('/workshops/{identifier}/attendees/remove/{attendee_identifier}', name: 'remove_attendee_from_workshop', methods: ['POST'])]
+#[OA\Post(tags: ['Workshop'])]
 class RemoveAttendeeFromWorkshopController
 {
     public function __construct(

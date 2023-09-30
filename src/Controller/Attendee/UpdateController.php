@@ -7,6 +7,7 @@ namespace App\Controller\Attendee;
 use App\Domain\AttendeeUpdater;
 use App\Domain\Model\UpdateAttendeeModel;
 use App\Entity\Attendee;
+use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -14,6 +15,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_USER')]
 #[Route('/attendees/{identifier}', name: 'update_attendee', methods: ['PUT'])]
+#[OA\Put(tags: ['Attendee'])]
 final class UpdateController
 {
     public function __construct(
