@@ -7,6 +7,7 @@ namespace App\Controller\Workshop;
 use App\Domain\Model\UpdateWorkshopModel;
 use App\Domain\WorkshopUpdater;
 use App\Entity\Workshop;
+use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -14,6 +15,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_USER')]
 #[Route('/workshops/{identifier}', name: 'update_workshop', methods: ['PUT'])]
+#[OA\Put(tags: ['Workshop'])]
 final class UpdateController
 {
     public function __construct(

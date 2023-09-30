@@ -1,0 +1,12 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: RESTful Webservices in Symfony
+            description: "SymfonyLive Berlin 2023"
+            version: 1.0.0
+    areas:
+        path_patterns:
+            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
+            - ^/workshops
+            - ^/attendees
+
