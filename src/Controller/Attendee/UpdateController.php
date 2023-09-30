@@ -10,7 +10,9 @@ use App\Entity\Attendee;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_USER')]
 #[Route('/attendees/{identifier}', name: 'update_attendee', methods: ['PUT'])]
 final class UpdateController
 {

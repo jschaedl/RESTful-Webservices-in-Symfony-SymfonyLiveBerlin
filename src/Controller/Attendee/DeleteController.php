@@ -9,7 +9,9 @@ use App\Entity\Attendee;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 #[Route('/attendees/{identifier}', name: 'delete_attendee', methods: ['DELETE'])]
 class DeleteController
 {
